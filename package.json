@@ -1,0 +1,15 @@
+{
+  "name": "cheapass-lambda",
+  "version": "1.0.0",
+  "description": "",
+  "main": "client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^3.6.6",
+    "firebase-admin": "^4.0.5"
+  }
+}
