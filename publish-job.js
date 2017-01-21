@@ -32,6 +32,7 @@ database.ref('/clients').once('value')
                 database.ref('/job/' + clientId + '/result').on('value', jobResultValue => {
                     const jobResult = jobResultValue.val();
                     if (jobResult != null) {
+                        database.ref('/job/' + clientId).remove();
                         resolve(jobResult);
                     };
                 })));
