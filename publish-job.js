@@ -29,7 +29,7 @@ database.ref('/clients').once('value')
 
         console.log(result);
 
-        database.ref('/job/').update(result);
+        database.ref('/job/').set(result);
 	})
 	.then(() => {
 		firebase.database().goOffline();
