@@ -1,6 +1,4 @@
 var firebase = require("firebase");
-const util = require('util');
-const vm = require('vm');
 
 var config = require('./config.json');
 

@@ -3,6 +3,9 @@
 var firebase = require('./firebase.js');
 var database = firebase.database();
 
+const util = require('util');
+const vm = require('vm');
+
 // ******
 // Register client
 // ******
