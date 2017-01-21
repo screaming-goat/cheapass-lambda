@@ -1,14 +1,6 @@
 'use strict';
-var firebase = require("firebase");
-const util = require('util');
-const vm = require('vm');
 
-var config = require('./config.json');
-
-// ******
-// Intialize firebase
-// ******
-firebase.initializeApp(config.firebase);
+var firebase = require('./firebase.js');
 var database = firebase.database();
 
 // ******
@@ -43,8 +35,8 @@ database.ref('/job/' + clientKey + '/input').on('value', function(incomingJob) {
         const context = new vm.createContext(job);
         script.runInContext(context);
 
-        console.log(util.inspect(job.result));
-        database.ref('/job/' + clientKey + '/result').update({ result: job.result });
+        console.log('Result:', util.inspect(job.result));
+		database.ref('/job/' + clientKey).update({ result: job.result });
     }
 });
 
