@@ -39,7 +39,15 @@ database.ref('/clients').once('value')
 
         Promise.all(allResultsPromiseList)
             .then(results => {
-                console.log(results);
+                const result = results.reduce((accumulator, item) =>
+                    Object.keys(item).reduce((acc, key) => {
+                        acc[key] = acc[key] ?
+                            acc[key] + item[key] :
+                            item[key];
+                        return acc;
+                    }, accumulator)
+                , {});
+                console.log(result);
             })
             .then(() => {
                 firebase.database().goOffline();
