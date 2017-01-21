@@ -33,7 +33,7 @@ database.ref('/clientCode').on('value', function(data) {
 // ******
 // Listen for incoming jobs and run client code on them
 // ******
-database.ref('/job/' + clientKey).on('value', function(incomingJob) {
+database.ref('/job/' + clientKey + '/input').on('value', function(incomingJob) {
     if (incomingJob.val() != null) {
         console.log('Incoming job', incomingJob.val());
 
@@ -44,7 +44,7 @@ database.ref('/job/' + clientKey).on('value', function(incomingJob) {
         script.runInContext(context);
 
         console.log(util.inspect(job.result));
-		database.ref('/job/' + clientKey).update({ result: job.result });
+        database.ref('/job/' + clientKey + '/result').update({ result: job.result });
     }
 });
 
