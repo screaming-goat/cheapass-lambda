@@ -16,24 +16,33 @@ database.ref('/clients').once('value')
         const textArray = text.split(/\s/);
         const noOfWordsInChunk = Math.floor(textArray.length / clientIds.length);
 
-        const result = {};
+        const jobs = {};
 
         clientIds.forEach(clientId => {
             const words = textArray.splice(0, noOfWordsInChunk).join(" ");
-            result[clientId] = {
+            jobs[clientId] = {
                 input: {
                     words
                 }
             };
         });
 
-        const allResultsPromiseList = clientIds.map(clientId => database.ref('/job/' + clientId + '/result').once('value'));
-        Promise.all(allResultsPromiseList).then(results => {
-            results.forEach(clientResult => console.log(clientResult.val()));
-        });
+        const allResultsPromiseList = clientIds.map(clientId =>
+            new Promise(resolve =>
+                database.ref('/job/' + clientId + '/result').on('value', jobResultValue => {
+                    const jobResult = jobResultValue.val();
+                    if (jobResult != null) {
+                        resolve(jobResult);
+                    };
+                })));
 
-        database.ref('/job/').set(result);
+        Promise.all(allResultsPromiseList)
+            .then(results => {
+                console.log(results);
+            })
+            .then(() => {
+                firebase.database().goOffline();
+            });
+
+        database.ref('/job/').set(jobs);
     })
-    .then(() => {
-        firebase.database().goOffline();
-    });
