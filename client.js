@@ -3,54 +3,49 @@ var firebase = require("firebase");
 const util = require('util');
 const vm = require('vm');
 
-// Initialize Firebase
 var config = require('./config.json');
-firebase.initializeApp(config.firebase);
 
-// Get a reference to the database service
+// ******
+// Intialize firebase
+// ******
+firebase.initializeApp(config.firebase);
 var database = firebase.database();
 
+// ******
+// Register client
+// ******
 console.log('Registering client...');
+var clientKey = database.ref('/clients').push().key;
+database.ref('/clients/' + clientKey).set({
+    timeConnected: JSON.stringify(new Date())
+});
 
-var key = database.ref('/clients').push().key;
-console.log('my key', key);
-
-key = 'test';
-
-/*
- database.ref('/clients/' + key).set({
- name: 'client3'
- });
-
- firebase.database().ref('/clients/' + key).once('value').then(function(data) {
- var value = data.val();
- console.log('got', value);
- });
- */
-
-var code = '';
+// ******
+// Listen and recieve client code
+// ******
+var clientCode = '';
 database.ref('/clientCode').on('value', function(data) {
-    code = data.val();
+    clientCode = data.val();
     console.log('Code updated');
 });
 
-database.ref('/job/' + key).on('value', function(job) {
-    if (job.val() != null) {
-        console.log('Incoming job', job.val());
-        var sandbox = job.val();
-        const script = new vm.Script(code);
-        const context = new vm.createContext(sandbox);
+
+// ******
+// Listen for incoming jobs and run client code on them
+// ******
+database.ref('/job/' + clientKey).on('value', function(incomingJob) {
+    if (incomingJob.val() != null) {
+        console.log('Incoming job', incomingJob.val());
+
+		// Set status
+        var job = incomingJob.val();
+        const script = new vm.Script(clientCode);
+        const context = new vm.createContext(job);
         script.runInContext(context);
-        console.log(util.inspect(sandbox));
+
+        console.log(util.inspect(job.result));
+		database.ref('/job/' + clientKey).update({ result: job.result });
     }
 });
 
 console.log('Done');
-
-
-
-
-/* Useful stuff:
- https://firebase.google.com/docs/database/web/read-and-write
-
- */
